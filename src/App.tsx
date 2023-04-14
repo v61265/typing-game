@@ -2,8 +2,9 @@ import styled from 'styled-components';
 import React from 'react';
 import UiSelectors from 'components/ui-selectors';
 import { useState } from 'react';
-import type { ModeObject } from 'types/common';
+import type { ModeObject, restTime } from 'types/common';
 import Controller from 'components/controller';
+import StatusBar from 'components/status-bar';
 
 const AppContainer = styled.div`
   min-width: 100vw;
@@ -50,6 +51,9 @@ function App() {
     name: undefined,
     wording: '請選擇遊玩模式',
   });
+  const [restTime, setRestTime] = useState<restTime>(60);
+  const [playingState, setPlayingState] = useState('stop');
+  const [score, setScore] = useState<number>(0);
   const ModeList: ModeObject[] = [
     {
       name: 'character',
@@ -66,8 +70,12 @@ function App() {
         <GameTitle>TYPING GAME</GameTitle>
         {mode.name ? (
           <>
-            mode.wording
-            <Controller />
+            {mode.wording}
+            <Controller
+              playingState={playingState}
+              setPlayingState={setPlayingState}
+            />
+            <StatusBar score={score} restTime={restTime} />
           </>
         ) : (
           <UiSelectors
