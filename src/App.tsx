@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
 import UiSelectors from 'components/ui-selectors';
 import { useState } from 'react';
 import type { ModeObject, restTime } from 'types/common';
@@ -51,7 +51,7 @@ function App() {
     name: undefined,
     wording: '請選擇遊玩模式',
   });
-  const [restTime, setRestTime] = useState<restTime>(60);
+  const [restTime, setRestTime] = useState<number>(60);
   const [playingState, setPlayingState] = useState('stop');
   const [score, setScore] = useState<number>(0);
   const ModeList: ModeObject[] = [
@@ -64,6 +64,25 @@ function App() {
       wording: '單字模式',
     },
   ];
+
+  const countDownTime = useCallback(() => {
+    if (restTime) {
+      setTimeout(() => {
+        setRestTime((prev: number) => prev - 1);
+      }, 1000);
+    } else {
+      setPlayingState('stop');
+    }
+  }, [restTime]);
+
+  useEffect(() => {
+    if (playingState === 'start') {
+      countDownTime();
+    } else if (playingState === 'stop') {
+      setRestTime(60);
+    }
+  }, [playingState, countDownTime]);
+
   return (
     <AppContainer>
       <ContentContainer>
