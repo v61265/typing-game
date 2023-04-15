@@ -2,9 +2,11 @@ import styled from 'styled-components';
 import React, { useCallback, useEffect } from 'react';
 import UiSelectors from 'components/ui-selectors';
 import { useState } from 'react';
-import type { ModeObject, restTime } from 'types/common';
+import type { ModeObject } from 'types/common';
 import Controller from 'components/controller';
 import StatusBar from 'components/status-bar';
+import axios from 'axios';
+import CharactorsPlayground from 'components/charactors-playground';
 
 const AppContainer = styled.div`
   min-width: 100vw;
@@ -39,6 +41,8 @@ const GameTitle = styled.h1`
   line-height: 150%;
   margin: 0;
   margin-top: 40px;
+  text-shadow: 4px 3px 0 ${({ theme }) => theme.color.black};
+  color: ${({ theme }) => theme.color.green};
   ${({ theme }) => `
     ${theme.breakpoint.md} {
       font-size: 72px;
@@ -47,13 +51,6 @@ const GameTitle = styled.h1`
 `;
 
 function App() {
-  const [mode, setMode] = useState<ModeObject>({
-    name: undefined,
-    wording: '請選擇遊玩模式',
-  });
-  const [restTime, setRestTime] = useState<number>(60);
-  const [playingState, setPlayingState] = useState('stop');
-  const [score, setScore] = useState<number>(0);
   const ModeList: ModeObject[] = [
     {
       name: 'character',
@@ -64,6 +61,48 @@ function App() {
       wording: '單字模式',
     },
   ];
+  const [mode, setMode] = useState<ModeObject>({
+    name: undefined,
+    wording: '請選擇遊玩模式',
+  });
+  const [restTime, setRestTime] = useState<number>(60);
+  const [playingState, setPlayingState] = useState('stop');
+  const [score, setScore] = useState<number>(0);
+  const [allTypeNumber, setAllTypeNumber] = useState<number>(0);
+  const [correctTypeNumber, setCorrectTypeNumber] = useState<number>(0);
+  const [target, setTarget] = useState<string[]>([]);
+
+  const fetchWordTargetWords = useCallback(async () => {
+    try {
+      const { data } = await axios.get(
+        'https://raw.githubusercontent.com/bitcoin/bips/master/bip-0039/english.txt'
+      );
+      const wordTargetsList = data.split(/\n/);
+      setTarget(wordTargetsList);
+    } catch (e) {
+      console.log(e);
+      setTarget([
+        'fetch',
+        'data',
+        'error',
+        'please',
+        'connect',
+        'v61265@gmail.com',
+      ]);
+    }
+  }, []);
+  const generateRandomChars = useCallback(() => {
+    const result: string[] = [];
+    const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    const charactersLength = characters.length;
+
+    for (let i = 0; i < 1000; i++) {
+      const randomIndex = Math.floor(Math.random() * charactersLength);
+      const randomChar = characters.charAt(randomIndex);
+      result.push(randomChar);
+    }
+    setTarget(result);
+  }, []);
 
   const countDownTime = useCallback(() => {
     if (restTime) {
@@ -83,6 +122,14 @@ function App() {
     }
   }, [playingState, countDownTime]);
 
+  useEffect(() => {
+    if (mode.name === 'word') {
+      fetchWordTargetWords();
+    } else {
+      generateRandomChars();
+    }
+  }, [mode]);
+
   return (
     <AppContainer>
       <ContentContainer>
@@ -95,6 +142,13 @@ function App() {
               setPlayingState={setPlayingState}
             />
             <StatusBar score={score} restTime={restTime} />
+            <CharactorsPlayground
+              target={target}
+              setCorrectTypeNumber={setCorrectTypeNumber}
+              setAllTypeNumber={setAllTypeNumber}
+              setScore={setScore}
+              canType={playingState === 'start'}
+            />
           </>
         ) : (
           <UiSelectors

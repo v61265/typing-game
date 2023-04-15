@@ -1,7 +1,5 @@
 import UiButton from './ui-button';
 import styled from 'styled-components';
-import { useEffect } from 'react';
-import { useCallback } from 'react';
 
 const ControllerWrapper = styled.div`
   margin-top: 24px;

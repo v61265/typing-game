@@ -1,4 +1,4 @@
-export type ThemeType = typeof theme
+export type ThemeType = typeof theme;
 
 export const mediaSize = {
   xs: 0,
@@ -7,7 +7,7 @@ export const mediaSize = {
   lg: 960,
   xl: 1200,
   xxl: 1400,
-}
+};
 
 export const theme = {
   mediaSize,
@@ -20,9 +20,11 @@ export const theme = {
     xxl: `@media (min-width: ${mediaSize.xxl}px)`,
   },
   color: {
-    primary: '#FF5641',
-    light: '#FF8C7D',
-  }
-}
+    primary: '#7ac0c6',
+    green: '#96bd4d',
+    black: '#502e17',
+    red: '#ff7963',
+  },
+};
 
-export default theme
+export default theme;
