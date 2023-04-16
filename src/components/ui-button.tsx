@@ -40,10 +40,14 @@ function UiButton({
   children,
   onClick,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode | string;
   onClick: () => void;
 }): JSX.Element {
-  return <ButtonWrapper onClick={onClick}>{children}</ButtonWrapper>;
+  return (
+    <ButtonWrapper className='button' onClick={onClick}>
+      {children}
+    </ButtonWrapper>
+  );
 }
 
 export default UiButton;

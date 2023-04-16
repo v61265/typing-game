@@ -1,5 +1,6 @@
 import UiButton from './ui-button';
 import styled from 'styled-components';
+import type { playingState } from 'types/common';
 
 const ControllerWrapper = styled.div`
   margin-top: 24px;
@@ -42,8 +43,8 @@ function Controller({
   playingState,
   setPlayingState,
 }: {
-  playingState: string;
-  setPlayingState: React.Dispatch<React.SetStateAction<string>>;
+  playingState: playingState;
+  setPlayingState: React.Dispatch<React.SetStateAction<playingState>>;
 }): JSX.Element {
   const handleOnClickStartAndPause = () => {
     playingState === 'start'

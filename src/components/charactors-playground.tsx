@@ -1,6 +1,7 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import styled from 'styled-components';
 import { isMobile } from 'react-device-detect';
+import type { TypingInfo, ScoreInfo } from 'types/common';
 
 const Wrapper = styled.div<{ isMobile: boolean }>`
   margin-top: 24px;
@@ -78,20 +79,17 @@ const InputGround = styled.textarea<{ isMobile: boolean }>`
 
 function CharactorsPlayground({
   target,
-  setCorrectTypeNumber,
-  setAllTypeNumber,
-  setScore,
   canType,
+  typingInfo,
+  setScoreInfo,
+  setTypingInfo,
 }: {
   target: string[];
-  setCorrectTypeNumber: React.Dispatch<React.SetStateAction<number>>;
-  setAllTypeNumber: React.Dispatch<React.SetStateAction<number>>;
-  setScore: React.Dispatch<React.SetStateAction<number>>;
   canType: boolean;
+  typingInfo: TypingInfo;
+  setTypingInfo: React.Dispatch<React.SetStateAction<TypingInfo>>;
+  setScoreInfo: React.Dispatch<React.SetStateAction<ScoreInfo>>;
 }): JSX.Element {
-  const [nowIndex, setNowIndex] = useState<number>(0);
-  const [inputValue, setInputValue] = useState<string | number>('');
-  const [isWrong, setIsWrong] = useState<boolean>(false);
   const renderTargetList = useMemo(() => {
     const targetWithIndex = target.map((item, index) => {
       return {
@@ -99,27 +97,54 @@ function CharactorsPlayground({
         index,
       };
     });
-    if (nowIndex > 6) {
-      return targetWithIndex.slice(nowIndex - 5, nowIndex + 5);
+    if (typingInfo.nowIndex > 6) {
+      return targetWithIndex.slice(
+        typingInfo.nowIndex - 5,
+        typingInfo.nowIndex + 5
+      );
     }
     return targetWithIndex.slice(0, 11);
-  }, [nowIndex, target]);
+  }, [typingInfo, target]);
   const handleOnChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { value } = e.target;
-    setAllTypeNumber((prev) => prev + 1);
-    if (value[value.length - 1] === target[nowIndex]) {
-      setInputValue(value);
-      setNowIndex((prev) => prev + 1);
-      setCorrectTypeNumber((prev) => prev + 1);
-      setIsWrong(false);
-      setScore((prev) => prev + 10);
+    setScoreInfo((prev) => {
+      return {
+        ...prev,
+        allTypeNumber: prev.allTypeNumber + 1,
+      };
+    });
+    if (value[value.length - 1] === target[typingInfo.nowIndex]) {
+      setScoreInfo((prev) => {
+        return {
+          ...prev,
+          correctTypeNumber: prev.correctTypeNumber + 1,
+          score: prev.score + 10,
+        };
+      });
+      setTypingInfo((prev) => {
+        return {
+          inputValue: value,
+          nowIndex: prev.nowIndex + 1,
+          isWrong: false,
+        };
+      });
     } else {
-      setIsWrong(true);
-      setScore((prev) => {
-        if (prev < 2) {
-          return 0;
+      setTypingInfo((prev) => {
+        return {
+          ...prev,
+          isWrong: true,
+        };
+      });
+      setScoreInfo((prev) => {
+        let score;
+        if (prev.score <= 2) {
+          score = 0;
         }
-        return prev - 2;
+        score = prev.score - 2;
+        return {
+          ...prev,
+          score,
+        };
       });
     }
   };
@@ -130,9 +155,11 @@ function CharactorsPlayground({
           return (
             <CharItem
               key={index}
-              hasDone={charItem.index < nowIndex}
+              hasDone={charItem.index < typingInfo.nowIndex}
               isMobile={isMobile}
-              isWrong={isWrong && charItem.index === nowIndex}
+              isWrong={
+                typingInfo.isWrong && charItem.index === typingInfo.nowIndex
+              }
             >
               {charItem.content}
             </CharItem>
@@ -141,7 +168,7 @@ function CharactorsPlayground({
       </TargetGround>
       <InputGround
         isMobile={isMobile}
-        value={inputValue}
+        value={typingInfo.inputValue}
         onChange={handleOnChange}
         disabled={!canType}
       ></InputGround>

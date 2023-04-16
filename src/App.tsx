@@ -1,12 +1,18 @@
 import styled from 'styled-components';
-import React, { useCallback, useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import UiSelectors from 'components/ui-selectors';
 import { useState } from 'react';
-import type { ModeObject } from 'types/common';
+import type {
+  ModeObject,
+  playingState,
+  TypingInfo,
+  ScoreInfo,
+} from 'types/common';
 import Controller from 'components/controller';
 import StatusBar from 'components/status-bar';
 import axios from 'axios';
 import CharactorsPlayground from 'components/charactors-playground';
+import Modal from 'components/modal';
 
 const AppContainer = styled.div`
   min-width: 100vw;
@@ -66,11 +72,18 @@ function App() {
     wording: '請選擇遊玩模式',
   });
   const [restTime, setRestTime] = useState<number>(60);
-  const [playingState, setPlayingState] = useState('stop');
-  const [score, setScore] = useState<number>(0);
-  const [allTypeNumber, setAllTypeNumber] = useState<number>(0);
-  const [correctTypeNumber, setCorrectTypeNumber] = useState<number>(0);
+  const [playingState, setPlayingState] = useState<playingState>(undefined);
   const [target, setTarget] = useState<string[]>([]);
+  const [scoreInfo, setScoreInfo] = useState<ScoreInfo>({
+    allTypeNumber: 0,
+    correctTypeNumber: 0,
+    score: 0,
+  });
+  const [typingInfo, setTypingInfo] = useState<TypingInfo>({
+    nowIndex: 0,
+    isWrong: false,
+    inputValue: '',
+  });
 
   const fetchWordTargetWords = useCallback(async () => {
     try {
@@ -91,11 +104,11 @@ function App() {
       ]);
     }
   }, []);
+
   const generateRandomChars = useCallback(() => {
     const result: string[] = [];
     const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
     const charactersLength = characters.length;
-
     for (let i = 0; i < 1000; i++) {
       const randomIndex = Math.floor(Math.random() * charactersLength);
       const randomChar = characters.charAt(randomIndex);
@@ -103,6 +116,30 @@ function App() {
     }
     setTarget(result);
   }, []);
+
+  const restart = () => {
+    setPlayingState(undefined);
+    setRestTime(60);
+    setScoreInfo(() => {
+      return {
+        score: 0,
+        allTypeNumber: 0,
+        correctTypeNumber: 0,
+      };
+    });
+    setTypingInfo(() => {
+      return {
+        nowIndex: 0,
+        isWrong: false,
+        inputValue: '',
+      };
+    });
+    if (mode.name === 'word') {
+      fetchWordTargetWords();
+    } else {
+      generateRandomChars();
+    }
+  };
 
   const countDownTime = useCallback(() => {
     if (restTime) {
@@ -141,13 +178,13 @@ function App() {
               playingState={playingState}
               setPlayingState={setPlayingState}
             />
-            <StatusBar score={score} restTime={restTime} />
+            <StatusBar score={scoreInfo.score} restTime={restTime} />
             <CharactorsPlayground
               target={target}
-              setCorrectTypeNumber={setCorrectTypeNumber}
-              setAllTypeNumber={setAllTypeNumber}
-              setScore={setScore}
               canType={playingState === 'start'}
+              setScoreInfo={setScoreInfo}
+              setTypingInfo={setTypingInfo}
+              typingInfo={typingInfo}
             />
           </>
         ) : (
@@ -158,6 +195,9 @@ function App() {
           />
         )}
       </ContentContainer>
+      {playingState === 'stop' && (
+        <Modal scoreInfo={scoreInfo} restart={restart} />
+      )}
     </AppContainer>
   );
 }
