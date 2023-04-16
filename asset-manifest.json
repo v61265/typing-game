@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/type-game/static/css/main.58462fbc.css",
+    "main.js": "/type-game/static/js/main.a2fd6953.js",
+    "index.html": "/type-game/index.html",
+    "main.58462fbc.css.map": "/type-game/static/css/main.58462fbc.css.map",
+    "main.a2fd6953.js.map": "/type-game/static/js/main.a2fd6953.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.58462fbc.css",
+    "static/js/main.a2fd6953.js"
+  ]
+}
