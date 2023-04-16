@@ -11,7 +11,7 @@ import type {
 import Controller from 'components/controller';
 import StatusBar from 'components/status-bar';
 import axios from 'axios';
-import CharactorsPlayground from 'components/charactors-playground';
+import Playground from 'components/playground';
 import Modal from 'components/modal';
 
 const AppContainer = styled.div`
@@ -71,6 +71,7 @@ function App() {
     name: undefined,
     wording: '請選擇遊玩模式',
   });
+  const [wordTargetsList, setWordTargetsList] = useState<string[]>([]);
   const [restTime, setRestTime] = useState<number>(60);
   const [playingState, setPlayingState] = useState<playingState>(undefined);
   const [target, setTarget] = useState<string[]>([]);
@@ -86,23 +87,31 @@ function App() {
   });
 
   const fetchWordTargetWords = useCallback(async () => {
-    try {
-      const { data } = await axios.get(
-        'https://raw.githubusercontent.com/bitcoin/bips/master/bip-0039/english.txt'
-      );
-      const wordTargetsList = data.split(/\n/);
-      setTarget(wordTargetsList);
-    } catch (e) {
-      console.log(e);
-      setTarget([
-        'fetch',
-        'data',
-        'error',
-        'please',
-        'connect',
-        'v61265@gmail.com',
-      ]);
+    let wordList = wordTargetsList;
+    if (!wordTargetsList.length) {
+      try {
+        const { data } = await axios.get(
+          'https://raw.githubusercontent.com/bitcoin/bips/master/bip-0039/english.txt'
+        );
+        const wordTargetsList = data.split(/\n/);
+        setWordTargetsList(wordTargetsList);
+        wordList = wordTargetsList;
+      } catch (e) {
+        console.log(e);
+        const errorList = [
+          'fetch',
+          'data',
+          'error',
+          'please',
+          'connect',
+          'v61265@gmail.com',
+        ];
+        setTarget(errorList);
+        setWordTargetsList(errorList);
+        return;
+      }
     }
+    setTarget(wordList.sort(() => Math.random() - 0.5));
   }, []);
 
   const generateRandomChars = useCallback(() => {
@@ -179,7 +188,8 @@ function App() {
               setPlayingState={setPlayingState}
             />
             <StatusBar score={scoreInfo.score} restTime={restTime} />
-            <CharactorsPlayground
+            <Playground
+              mode={mode.name}
               target={target}
               canType={playingState === 'start'}
               setScoreInfo={setScoreInfo}

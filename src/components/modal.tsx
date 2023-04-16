@@ -71,8 +71,10 @@ function Modal({
   const modalRef = useRef<HTMLDivElement>(null);
   useOnClickOutside(modalRef, restart);
   const accuracy = useMemo(() => {
-    if (!scoreInfo.allTypeNumber) return 0;
-    return `${(scoreInfo.correctTypeNumber / scoreInfo.allTypeNumber) * 100}%`;
+    if (!scoreInfo.allTypeNumber) return '0%';
+    const accuracyNum =
+      (scoreInfo.correctTypeNumber / scoreInfo.allTypeNumber) * 100;
+    return `${accuracyNum.toFixed(2)}%`;
   }, [scoreInfo]);
   return (
     <WindowContainer>
