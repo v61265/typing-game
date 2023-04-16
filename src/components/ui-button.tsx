@@ -22,7 +22,7 @@ const ButtonWrapper = styled.button`
       background: ${({ theme }) => theme.color.primary};
     }
     .start {
-      border-right: 12px solid ${({ theme }) => theme.color.primary};
+      border-left: 12px solid ${({ theme }) => theme.color.primary};
     }
     .pause {
       background: ${({ theme }) => theme.color.primary};
