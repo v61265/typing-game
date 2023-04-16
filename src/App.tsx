@@ -111,7 +111,7 @@ function App() {
         return;
       }
     }
-    setTarget(wordList.sort(() => Math.random() - 0.5));
+    setTarget(wordList.sort(() => Math.random() - 0.5).filter((item) => item));
   }, []);
 
   const generateRandomChars = useCallback(() => {

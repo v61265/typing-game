@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import styled from 'styled-components';
 import { isMobile } from 'react-device-detect';
 import type { TypingInfo, ScoreInfo } from 'types/common';
+import theme from 'styles/themes';
 
 const Wrapper = styled.div<{ isMobile: boolean }>`
   margin-top: 24px;
@@ -50,13 +51,20 @@ const CharItem = styled.div<{
 `;
 
 const InputGroup = styled.div<{ isMobile: boolean }>`
-  ${isMobile &&
-  `
-    position: fixed;
-    bottom: 20px;
-    left: 0;
-    width: 94vw;
-  `}
+  position: fixed;
+  bottom: 20px;
+  left: 0;
+  width: 94vw;
+  ${({ isMobile, theme }) => {
+    return (
+      !isMobile &&
+      `
+        ${theme.breakpoint.md} {
+          position: relative;
+        }
+      `
+    );
+  }}
 `;
 
 const InputGround = styled.textarea`
@@ -116,12 +124,14 @@ function Playground({
   mode: string;
 }): JSX.Element {
   const renderTargetList = useMemo(() => {
-    const targetWithIndex = target.map((item, index) => {
-      return {
-        content: item,
-        index,
-      };
-    });
+    const targetWithIndex = target
+      .filter((item) => item)
+      .map((item, index) => {
+        return {
+          content: item,
+          index,
+        };
+      });
     if (mode === 'character') {
       if (typingInfo.nowIndex > 6) {
         return targetWithIndex.slice(
