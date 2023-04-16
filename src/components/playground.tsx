@@ -49,26 +49,7 @@ const CharItem = styled.div<{
   `}
 `;
 
-const InputGround = styled.textarea<{ isMobile: boolean }>`
-  width: 100%;
-  font-size: 20px;
-  padding: 8px;
-  border-radius: 6px;
-  background: rgba(225, 225, 225, 0.5);
-  margin-top: 24px;
-  border: 1px solid ${({ theme }) => theme.color.primary};
-  color: ${({ theme }) => theme.color.black};
-  letter-spacing: 0.5rem;
-  display: block;
-  resize: none;
-  &:focus {
-    background: rgba(225, 225, 225, 0.7);
-    outline: none;
-  }
-  &:disabled {
-    background: ${({ theme }) => theme.color.black};
-    opacity: 0.5;
-  }
+const InputGroup = styled.div<{ isMobile: boolean }>`
   ${isMobile &&
   `
     position: fixed;
@@ -76,6 +57,30 @@ const InputGround = styled.textarea<{ isMobile: boolean }>`
     left: 0;
     width: 94vw;
   `}
+`;
+
+const InputGround = styled.textarea`
+  width: 100%;
+  font-size: 20px;
+  padding: 8px;
+  border-radius: 6px;
+  background: rgba(225, 225, 225, 0.5);
+  margin-top: 12px;
+  border: 1px solid ${({ theme }) => theme.color.primary};
+  color: ${({ theme }) => theme.color.black};
+  letter-spacing: 0.5rem;
+  display: block;
+  resize: none;
+  position: relative;
+  &:focus {
+    background: rgba(225, 225, 225, 0.7);
+    outline: none;
+  }
+  &:disabled {
+    background: ${({ theme }) => theme.color.black};
+    opacity: 0.5;
+    position: relative;
+  }
 `;
 
 const WordTargets = styled(CharTargets)`
@@ -88,6 +93,11 @@ const WordItem = styled(CharItem)`
     margin-top: 12px;
     margin-left: 0;
   }
+`;
+
+const Hint = styled.div`
+  color: #ffffff;
+  margin-top: 24px;
 `;
 
 function Playground({
@@ -299,13 +309,15 @@ function Playground({
         </WordTargets>
       )}
 
-      <InputGround
-        isMobile={isMobile}
-        value={typingInfo.inputValue}
-        onChange={handleOnChange}
-        disabled={!canType}
-        onKeyDown={handleKeyDown}
-      ></InputGround>
+      <InputGroup isMobile={isMobile}>
+        {!canType && <Hint>請按上方三角形開始遊玩</Hint>}
+        <InputGround
+          value={typingInfo.inputValue}
+          onChange={handleOnChange}
+          disabled={!canType}
+          onKeyDown={handleKeyDown}
+        ></InputGround>
+      </InputGroup>
     </Wrapper>
   );
 }
